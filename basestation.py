@@ -1,9 +1,22 @@
 #!/usr/bin/env python
+"""
+authors: Kevin Peterson and Stan Baek
+Modification on 2011-10-4:
+
+This file creates a class BaseStation that can be used to send commands 
+to the custom basestation or an XBee module
+
+Wrapper functions are provided for this class, see:
+base_functions and robot_functions
+
+"""
+
 
 import time, os, sys
+import command 
 from serial import *
+from struct import *
 from xbee import XBee
-from payload import Payload
 
 class BaseStation(object):
 
@@ -20,48 +33,30 @@ class BaseStation(object):
 
     def close(self):
         try:
+            self.xb.halt()
             self.ser.close()
         except SerialException:
             print "SerialException"
 
-
-    def send(self, status, type, data ):
-        pld = Payload( ''.join(data), status, type )
-        self.xb.tx(dest_addr = self.dest_addr, data = str(pld))
-
-    def write(self, data):
-        status = 0x00
-        type = 0x00
-        data_length = len(data)
-        start = 0
+    def sendTX(self, status, type, data ):
+        pld = chr(status) + chr(type)  + ''.join(data)
+        self.xb.tx(dest_addr = self.dest_addr, data = pld)
+        time.sleep(0.1)
         
-
-        while(data_length > 0):
-            if data_length > 80:
-                self.send( status, type, data[start:start+80] )
-                data_length -= 80
-                start += 80
+    def sendAT(self, command, parameter = None, frame_id = None):
+        if parameter is not None:
+            if frame_id is not None:
+                self.xb.at(frame_id = frame_id, command = command, parameter = parameter)
             else:
-                self.send( status, type, data[start:len(data)] )
-                data_length = 0
-            time.sleep(0.05)
-            
+                self.xb.at(command = command, parameter = parameter)
+        elif frame_id is not None:
+            self.xb.at(frame_id = frame_id, command = command)
+        else:
+            self.xb.at(command = command)
+        time.sleep(0.1)
 
     def read(self):
         packet = self.xb.wait_read_frame()
-    
-        pld = Payload(packet.get('rf_data'))
-        #rssi = ord(packet.get('rssi'))
-        #(src_addr, ) = unpack('H', packet.get('source_addr'))
-        #id = packet.get('id')
-        #options = ord(packet.get('options'))
+
+        return packet
         
-        status = pld.status
-        type = pld.type
-        data = pld.data
-   
-        return data
-
-
-
-
