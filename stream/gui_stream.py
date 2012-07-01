@@ -1,8 +1,9 @@
 import threading
 import wx
+from asynch_dispatch import *
 
 class GUI_Stream(threading.Thread):
-  def __init__(self, frameClass=None, panelClass=None, title='', autoStart=True):
+  def __init__(self, frameClass=None, panelClass=None, title='', callbacks=None, sinks=None, autoStart=True):
     threading.Thread.__init__(self)
     self.daemon = True
     
@@ -15,6 +16,8 @@ class GUI_Stream(threading.Thread):
     
     self.title = title
     
+    self.dispatcher=AsynchDispatch(sinks=sinks, callbacks=callbacks)
+      
     if autoStart:
       self.start()
       
@@ -25,6 +28,12 @@ class GUI_Stream(threading.Thread):
     else:
       self.frame = ThreadedFrame(self.title, self.panelClass)
     self.app.MainLoop()
+  
+  def put(self, message):
+    self.dispatcher.put(message)
+  
+  def add_sinks(self, sinks):
+    self.dispatcher.put(message)
     
 class ThreadedFrame(wx.Frame):
   def __init__(self, title, panelClass):

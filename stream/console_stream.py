@@ -17,7 +17,10 @@ class ConsoleStream(threading.Thread):
     while(True):
       cmd = sys.stdin.readline()
       if cmd:
-        self.dispatcher.dispatch(Message('console_input',cmd))
-
+        self.dispatcher.dispatch(Message('console_input',cmd.strip()))
+  
+  def add_sinks(self, sinks):
+    self.dispatcher.add_sinks(sinks)
+    
   def put(self, message):
     print message

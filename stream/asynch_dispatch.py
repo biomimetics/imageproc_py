@@ -2,9 +2,13 @@ import threading
 import Queue
 
 class Message():
-  def __init__(self, type=None, data=None):
-    self.type = type
-    self.data = data
+  def __init__(self, msg_type=None, data=None):
+    if type(msg_type) is tuple:
+      self.type = msg_type[0]
+      self.data = msg_type[1]
+    else:
+      self.type = msg_type
+      self.data = data
     
   def __str__(self):
     return '%s: %s' % (self.type.__str__(), self.data.__str__())
@@ -48,24 +52,36 @@ class AsynchDispatch(threading.Thread):
         if message.type in self.callbacks.keys():
           for callback in self.callbacks[message.type]:
             callback(message)
-        
+        elif None in self.callbacks.keys():
+          for callback in self.callbacks[None]:
+            callback(message)
+            
   def put(self, messages):
     # Atomically add messages to in_queue and signal that there is new data
     self.new_data.acquire()
     
-    if type(messages) is not list:
-      messages = [messages]
-    for message in messages:
+    for message in self.to_message_list(messages):
       self.in_queue.put(message)
         
     self.new_data.notify()
     self.new_data.release()
   
-  def dispatch(self, messages):
+  def to_message_list(self, messages):
+    messages_out = []
+    
     if type(messages) is not list:
       messages = [messages]
-      
-    for message in messages:
+    
+    for m_i in messages:
+      if type(m_i) is tuple:
+        messages_out.append(Message(m_i))
+      else:
+        messages_out.append(m_i)
+    
+    return messages_out
+    
+  def dispatch(self, messages):
+    for message in self.to_message_list(messages):
       if message.type in self.sinks.keys():
         for sink in self.sinks[message.type]:
           sink(message)
