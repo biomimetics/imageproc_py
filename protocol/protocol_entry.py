@@ -1,3 +1,5 @@
+from struct import unpack
+
 class ProtocolEntry():
   def __init__(self, name, value, dataFormat=None, stringFormat=None):
     self.name = name

@@ -2,7 +2,7 @@ from struct import pack, unpack
 from protocol import Protocol
 
 class Packet():
-  def __init__(self, pkt_type=255, data='', status=0, dest_addr=-1, time=-1, payload=None, proto=Protocol()):
+  def __init__(self, pkt_type=255, data='', status=0, dest_addr=-1, time=-1, payload=None, protocol=Protocol()):
   
     self.dest_addr = dest_addr
     self.time = time
@@ -10,22 +10,22 @@ class Packet():
     if payload is not None:
       self.payload = payload
       self.pkt_type = ord(payload[0])
-      self.entry = proto.find(self.pkt_type)
+      self.entry = protocol.find(self.pkt_type)
       self.status = ord(payload[1])
       self.data = payload[2:]
     else:
       
       if type(pkt_type) is int:
         self.pkt_type = pkt_type
-        self.entry = proto.find(pkt_type)
+        self.entry = protocol.find(pkt_type)
       else:
-          self.entry = proto.find(pkt_type)
-          if self.entry is not None:
-            self.pkt_type = self.entry.value
-          else:
-            print 'Packet type \"%s\" not found' % pkt_type.__str__()
-            self.pkt_type = -1
-      
+        self.entry = protocol.find(pkt_type)
+        if self.entry is not None:
+          self.pkt_type = self.entry.value
+        else:
+          print 'Packet type \"%s\" not found' % pkt_type.__str__()
+          self.pkt_type = -1
+    
       self.payload = chr(status) + chr(self.pkt_type) + ''.join(data)
       
       self.status = status

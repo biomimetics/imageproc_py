@@ -44,7 +44,6 @@ class AsynchDispatch(threading.Thread):
       messages = []
       while not self.in_queue.empty():
         messages.append(self.in_queue.get())
-        
       self.new_data.release()      
       
       # Send data through callbacks
@@ -59,7 +58,6 @@ class AsynchDispatch(threading.Thread):
   def put(self, messages):
     # Atomically add messages to in_queue and signal that there is new data
     self.new_data.acquire()
-    
     for message in self.to_message_list(messages):
       self.in_queue.put(message)
         
