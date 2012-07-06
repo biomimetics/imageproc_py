@@ -51,7 +51,8 @@ class AsynchDispatch(threading.Thread):
         if message.type in self.callbacks.keys():
           for callback in self.callbacks[message.type]:
             callback(message)
-        elif None in self.callbacks.keys():
+        
+        if None in self.callbacks.keys():
           for callback in self.callbacks[None]:
             callback(message)
             
@@ -83,7 +84,11 @@ class AsynchDispatch(threading.Thread):
       if message.type in self.sinks.keys():
         for sink in self.sinks[message.type]:
           sink(message)
-    
+      
+      if None in self.sinks.keys():
+        for sink in self.sinks[None]:
+          sink(message)
+            
   def add_callbacks(self, callback_map):
     for msg_type,callbacks in callback_map.items():
       if msg_type in self.callbacks.keys():
