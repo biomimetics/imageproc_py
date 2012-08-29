@@ -1,6 +1,7 @@
 import threading
 import glob
-from asynch_dispatch import *
+
+from imageproc_py.stream.asynch_dispatch import *
 
 class FileStream(threading.Thread):
   def __init__(self, sinks=None, autoStart=True):

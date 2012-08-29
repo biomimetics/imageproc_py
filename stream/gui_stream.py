@@ -1,6 +1,7 @@
 import threading
 import wx
-from asynch_dispatch import *
+
+from imageproc_py.stream.asynch_dispatch import *
 
 class GUI_Stream(threading.Thread):
   def __init__(self, frameClass=None, panelClass=None, title='', callbacks=None, sinks=None, autoStart=True):
