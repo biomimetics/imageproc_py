@@ -29,7 +29,13 @@ class SerialStream(threading.Thread):
         rx_bytes = self.port.read(self.read_size)
         if rx_bytes != '':
           self.dispatcher.dispatch(Message('serial_data',rx_bytes))
-        
-  def send(self, message):
+  
+	def put(self,message):
+    self.dispatcher.put(message)
+  
+  def add_sinks(self,sinks):
+    self.dispatcher.add_sinks(sinks)     
+  
+	def send(self, message):
     if self.port is not None:
       self.port.write(message.data)
