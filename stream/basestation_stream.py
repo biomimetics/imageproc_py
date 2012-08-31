@@ -14,6 +14,8 @@ class BasestationStream(threading.Thread):
     threading.Thread.__init__(self)
     self.daemon = True
     
+    self.robots = {}
+    
     try:
       self.ser = serial.Serial(port, baudrate, timeout=3, rtscts=0)
       self.xb = XBee(self.ser)
@@ -58,9 +60,12 @@ class BasestationStream(threading.Thread):
     
     pkt = Packet(dest_addr=self.addr, time=self.last_time,
       payload=xbee_data.get('rf_data'))
+    
     self.dispatcher.dispatch(('packet',pkt))
-  
+    
   def send(self,message):
     pkt = message.data
     self.xb.tx(dest_addr = pack('>h',pkt.dest_addr), data = pkt.payload)
   
+  def register_robot(self,robot,addr)
+    self.dispatcher.add_sinks({addr:[robot.put]})

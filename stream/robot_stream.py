@@ -5,16 +5,57 @@ from imageproc_py.protocol.packet import *
 from imageproc_py.protocol.protocol import *
 
 class RobotStream():
+  INIT      = 0
+  RESET     = 1
+  SET_GAINS = 2
+  READY     = 3
+  FAIL      = 4
+  
   def __init__(self, basestation=None, addr=0x2072):
     self.basestation = basestation
+    
+    self.dispatcher=AsynchDispatch(sinks=sinks,
+      callbacks={'packet':[self.process_packet]})
+      
+    if self.basestation is not None:
+      self.basestation.register_robot(self, addr)
+      
     self.addr = addr
     
-    self.reset()
-    self.set_motor_gains([8000,100,0,0,10 , 8000,100,0,0,10]) #Hardware PID
-  
+    self.state = RobotStream.INIT
+    
+    self.new_data = threading.Condition()
+    
+  def run(self):
+    while(True):
+      self.new_data.acquire()
+      self.new_data.wait()
+      
+      if self.state == RobotStream.INIT:
+        self.reset()
+        self.state = RobotStream.RESET
+        
+      elif self.state == RobotStream.RESET:
+        
+        self.set_motor_gains([8000,100,0,0,10 , 8000,100,0,0,10]) #Hardware PID
+        
+      elif self.state == RobotStream.SET_GAINS:
+      elif self.state == RobotStream.READY:
+      elif self.state == RobotStream.FAIL:
+      
+  def process_packet(self,message):
+    pkt = message.data
+    
+    if pkt.dest_addr = self.addr
+    
   def send_packet(self, type, data=''):
     if self.basestation is not None:
       self.basestation.put(Message('packet',Packet(type,data,0,self.addr)))
+  
+  
+      
+  def put(self,message):
+    self.dispatcher.put(message)
     
   def reset(self):
     #xb_send(shared.xb, shared.DEST_ADDR, 0, command.SOFTWARE_RESET, pack('h',1))
