@@ -1,5 +1,6 @@
 from struct import pack, unpack
-from protocol import Protocol
+
+from imageproc_py.protocol.protocol import Protocol
 
 class Packet():
   def __init__(self, pkt_type=255, data='', status=0, dest_addr=-1, time=-1, payload=None, protocol=Protocol()):

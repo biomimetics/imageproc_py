@@ -41,12 +41,14 @@ class BasestationStream(threading.Thread):
     if self.xb is not None:
       while(True):
         data = self.xb.wait_read_frame()
+        print 'packet'
         self.receive_callback(data)
         
   def exit(self):
-    self.xb.halt()
-    self.ser.close()
-    self.xb = None
+    if self.xb is not None:
+      self.xb.halt()
+      self.ser.close()
+      self.xb = None
     
   def put(self,message):
     self.dispatcher.put(message)

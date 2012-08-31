@@ -1,4 +1,4 @@
-from protocol_entry import ProtocolEntry
+from imageproc_py.protocol.protocol_entry import ProtocolEntry
   
 STANDARD_PROTOCOL = [
   # CMD values of 0x00 - 0x7F(127) are defined here

@@ -1,6 +1,7 @@
 from struct import unpack
-from standard_protocol import STANDARD_PROTOCOL
-from protocol_entry import ProtocolEntry
+
+from imageproc_py.protocol.standard_protocol import STANDARD_PROTOCOL
+from imageproc_py.protocol.protocol_entry import ProtocolEntry
 
 class Protocol():
   def __init__(self, entries=STANDARD_PROTOCOL):
