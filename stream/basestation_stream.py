@@ -2,14 +2,14 @@ from xbee import XBee
 import time
 import serial
 import sys
-from struct import pack
+from struct import pack,unpack
 import threading
 
 from imageproc_py.stream.asynch_dispatch import *
+from imageproc_py.protocol.packet import *
 
 class BasestationStream(threading.Thread):
-  def __init__(self, port='COM1', baudrate=230400, addr=0x2071, sinks=None, timeout=-1, 
-      timeoutFunction = None):
+  def __init__(self, port='COM1', baudrate=230400, addr=0x2071, sinks=None, autoStart=True):
     
     threading.Thread.__init__(self)
     self.daemon = True
@@ -27,23 +27,14 @@ class BasestationStream(threading.Thread):
       callbacks={'packet':[self.send]})
       
     self.addr = addr
-    
-    self.timeout = timeout
-    self.last_time = -1
-    self.timeoutFunction = timeoutFunction
-    
-    old_timeout_code = '''def run(self):
-    while True:
-    if self.last_time != -1 and self.timeout != -1 \
-          and self.timeoutFunction is not None \
-          and (time.time() - self.last_time) > self.timeout:
-        self.timeoutFunction()  '''
-  
+        
+    if autoStart:
+        self.start()
+        
   def run(self):
     if self.xb is not None:
       while(True):
         data = self.xb.wait_read_frame()
-        print 'packet'
         self.receive_callback(data)
         
   def exit(self):
@@ -57,15 +48,20 @@ class BasestationStream(threading.Thread):
     
   def receive_callback(self,xbee_data):
     self.last_time = time.time()
-    
     pkt = Packet(dest_addr=self.addr, time=self.last_time,
       payload=xbee_data.get('rf_data'))
+      
+    source_addr = unpack('>h',xbee_data.get('source_addr'))
+    source_addr = source_addr[0]
     
-    self.dispatcher.dispatch(('packet',pkt))
+    if source_addr in self.dispatcher.sinks.keys():
+      self.dispatcher.dispatch((source_addr,pkt))
+    else:
+      self.dispatcher.dispatch(('packet',pkt))
     
   def send(self,message):
     pkt = message.data
     self.xb.tx(dest_addr = pack('>h',pkt.dest_addr), data = pkt.payload)
   
-  def register_robot(self,robot,addr)
+  def register_robot(self,robot,addr):
     self.dispatcher.add_sinks({addr:[robot.put]})

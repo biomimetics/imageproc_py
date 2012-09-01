@@ -10,9 +10,9 @@ class Packet():
     
     if payload is not None:
       self.payload = payload
-      self.pkt_type = ord(payload[0])
+      self.status = ord(payload[0])
+      self.pkt_type = ord(payload[1])
       self.entry = protocol.find(self.pkt_type)
-      self.status = ord(payload[1])
       self.data = payload[2:]
     else:
       
@@ -32,11 +32,11 @@ class Packet():
       self.status = status
       self.data = data
       
-    if self.entry is not None:
+    try:
       self.data_str = self.entry.formatData(self.data)
-    else:
+    except:
       self.data_str = self.data.encode('hex')
-        
+    
   def __str__(self):
     return '@ 0x%04X: S:%d T:0x%02X D:%s' % \
         (self.dest_addr, self.status, self.pkt_type, self.data_str)
