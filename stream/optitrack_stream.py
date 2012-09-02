@@ -17,11 +17,13 @@ class OptitrackStream(threading.Thread):
 
     self.c.Initialize("127.0.0.1", "127.0.0.1")
     
-    self.dispatcher=AsynchDispatch(sinks=sinks)
+    self.dispatcher=AsynchDispatch(sinks=sinks,callbacks={'set_time':[self.set_time]})
     self.recieve_queue = Queue.Queue()
     self.input_data = ''
 
     self.c.SetDataCallback(self.net_data_callback)
+    
+    self.start_time = time.time()
     
     #TODO: handle multiple rigid bodies effectively
     
@@ -38,17 +40,20 @@ class OptitrackStream(threading.Thread):
     else:
       return None
       
-  def put(self, data):
+  def put(self, message):
     self.dispatcher.put(message)
 
   def add_sinks(self,sinks):
     self.dispatcher.add_sinks(sinks)
-
+  
+  def set_time(self,message):
+    self.start_time = message.data
+    
   #formats data from Optitrack and dispatches it
   def net_data_callback(self, dataFrame):
     bodyData = []
     for body in dataFrame.RigidBodies:
-      bodyData.append([body.x, body.y, body.z, body.qx, body.qy, body.qz, body.qw])
+      bodyData.append([time.time()-self.start_time,body.x, body.y, body.z, body.qx, body.qy, body.qz, body.qw])
     
     self.dispatcher.dispatch(Message('optitrack_data', bodyData))
     

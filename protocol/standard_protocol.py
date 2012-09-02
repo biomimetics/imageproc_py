@@ -53,15 +53,15 @@ STANDARD_PROTOCOL = [
   ProtocolEntry('SET_MOVE_QUEUE', 0x86),
   ProtocolEntry('SET_STEERING_GAINS', 0x87, '5h'),
   ProtocolEntry('SOFTWARE_RESET', 0x88),
-  ProtocolEntry('SPECIAL_TELEMETRY', 0x89, '=LL'+14*'h'),
-  ProtocolEntry('ERASE_SECTORS', 0x8A),
-  ProtocolEntry('FLASH_READBACK', 0x8B),
+  ProtocolEntry('SPECIAL_TELEMETRY', 0x89, '=L'+14*'h'),
+  ProtocolEntry('ERASE_SECTORS', 0x8A, '=h'),
+  ProtocolEntry('FLASH_READBACK', 0x8B, '=h'),
   #TODO: Reconcile octoroach standard with turning bot code
   #ProtocolEntry('SLEEP', 0x8C),
   ProtocolEntry('SET_VEL_PROFILE', 0x8C, '24h'),
   ProtocolEntry('WHO_AM_I', 0x8D),
-  ProtocolEntry('START_TELEM', 0x8E),
-  ProtocolEntry('ZERO_POS', 0x8F),
+  ProtocolEntry('START_TELEM', 0x8E, '3h'),
+  ProtocolEntry('ZERO_POS', 0x8F, '=2l'),
   #ProtocolEntry('SET_HALL_GAINS', 0x91),
   #ProtocolEntry('SET_TAIL_QUEUE', 0x92)
   # CMD values of 0xF0(240) - 0xFF(255) are reserved for future use

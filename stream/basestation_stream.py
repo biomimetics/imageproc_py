@@ -60,8 +60,9 @@ class BasestationStream(threading.Thread):
       self.dispatcher.dispatch(('packet',pkt))
     
   def send(self,message):
-    pkt = message.data
-    self.xb.tx(dest_addr = pack('>h',pkt.dest_addr), data = pkt.payload)
+    if self.xb is not None:
+      pkt = message.data
+      self.xb.tx(dest_addr = pack('>h',pkt.dest_addr), data = pkt.payload)
   
   def register_robot(self,robot,addr):
     self.dispatcher.add_sinks({addr:[robot.put]})

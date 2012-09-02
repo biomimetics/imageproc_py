@@ -12,7 +12,7 @@ class FileStream(threading.Thread):
     self.new_data = threading.Condition()
     
     self.dispatcher=AsynchDispatch(sinks=sinks,
-      callbacks={None:[self.write],'file_line':[self.write],
+      callbacks={'file_line':[self.write],
                 'open':[self.open],'close':[self.close]})
                 
     self.file = None
