@@ -55,9 +55,9 @@ class radio:
         except self.serial.serialutil.SerialException as e:
             print("SerialException: " + str(e))
             sys.exit(1)
-    def send(self, dest_addr, pkt_status, pkt_type, pkt_data):
-        self.radio.tx(dest_addr=dest_addr, data=(chr(pkt_status) +            \
-                                                chr(pkt_type) + str(pkt_data)))
+    def send(self, dest_addr, pkt_status, pkt_type, pkt_data=''):
+        self.radio.tx(dest_addr=dest_addr, \
+                      data=(chr(pkt_status) + chr(pkt_type) + str(pkt_data)))
         time.sleep(.1)
     def __del__(self):
         self.radio.halt()
